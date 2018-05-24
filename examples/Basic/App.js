@@ -79,6 +79,8 @@ export default class App extends Component {
             renderItem: ({ item }) => this._renderItem(item),
             ListEmptyComponent: () => this._renderEmptyResult(),
           }}
+          showCancelButton
+          cancelText="取消"
         />
       </View>
     );

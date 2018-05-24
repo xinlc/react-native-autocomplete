@@ -29,7 +29,8 @@ export default class Autocomplete extends PureComponent {
     resultListProps: PropTypes.shape({
       ...FlatList.propTypes,
     }),
-    disableCancelButton: PropTypes.bool,
+    showCancelButton: PropTypes.bool,
+    cancelText: PropTypes.string,
   }; 
 
   static defaultProps = {
@@ -38,7 +39,8 @@ export default class Autocomplete extends PureComponent {
     renderResultList: props => (<FlatList {...props} />),
     textInputProps: {},
     resultListProps: {},
-    disableCancelButton: true,
+    showCancelButton: false,
+    cancelText: 'cancel'
   };
 
   constructor(props) {
@@ -122,12 +124,12 @@ export default class Autocomplete extends PureComponent {
   };
 
   renderCancelButton = (showResults) => {
-    const { disableCancelButton, renderCancelButton, } = this.props;
+    const { showCancelButton, cancelText, renderCancelButton, } = this.props;
 
-    if (!disableCancelButton && showResults) {
+    if (showCancelButton && showResults) {
       return renderCancelButton ? renderCancelButton() : (
         <TouchableOpacity onPress={this.cancel}>
-          <Text style={styles.cancel}>cancel</Text>
+          <Text style={styles.cancel}>{cancelText}</Text>
         </TouchableOpacity>
       );
     }
