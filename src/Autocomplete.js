@@ -22,12 +22,14 @@ export default class Autocomplete extends PureComponent {
     onShowResults: PropTypes.func,
     renderTextInput: PropTypes.func,
     renderResultList: PropTypes.func,
+    renderCancelButton: PropTypes.func,
     textInputProps: PropTypes.shape({
       ...TextInput.propTypes,
     }),
     resultListProps: PropTypes.shape({
       ...FlatList.propTypes,
     }),
+    disableCancelButton: PropTypes.bool,
   }; 
 
   static defaultProps = {
@@ -36,6 +38,7 @@ export default class Autocomplete extends PureComponent {
     renderResultList: props => (<FlatList {...props} />),
     textInputProps: {},
     resultListProps: {},
+    disableCancelButton: true,
   };
 
   constructor(props) {
@@ -66,7 +69,11 @@ export default class Autocomplete extends PureComponent {
   };
 
   cancel = () => {
-    this._hideResults();
+    this.setState({
+      showResults: false
+    });
+    this.textInput && this.textInput.clear();
+    this.blur();
   };
 
   _keyExtractor = (item, index) => index.toString();
@@ -78,14 +85,6 @@ export default class Autocomplete extends PureComponent {
       });
     }
     onChangeText && onChangeText(e);
-  };
-
-  _hideResults = () => {
-    this.setState({
-      showResults: false
-    });
-    this.textInput && this.textInput.clear();
-    this.blur();
   };
 
   renderTextInput = () => {
@@ -122,6 +121,19 @@ export default class Autocomplete extends PureComponent {
     return renderResultList(props);
   };
 
+  renderCancelButton = (showResults) => {
+    const { disableCancelButton, renderCancelButton, } = this.props;
+
+    if (!disableCancelButton && showResults) {
+      return renderCancelButton ? renderCancelButton() : (
+        <TouchableOpacity onPress={this.cancel}>
+          <Text style={styles.cancel}>cancel</Text>
+        </TouchableOpacity>
+      );
+    }
+    return null;
+  }
+
   render() {
     const { showResults } = this.state;
     const { containerStyle, inputContainerStyle, onShowResults } = this.props;
@@ -132,13 +144,7 @@ export default class Autocomplete extends PureComponent {
       <View style={[styles.container, containerStyle]}>
         <View style={[styles.inputContainer, inputContainerStyle]}>
           {this.renderTextInput()}
-          {
-            showResults ? (
-              <TouchableOpacity onPress={this._hideResults}>
-                <Text style={styles.cancel}>取消</Text>
-              </TouchableOpacity>
-            ) : null
-          }
+          {this.renderCancelButton(showResults)}
         </View>
         <View>
           {showResults && this.renderResultList()}
