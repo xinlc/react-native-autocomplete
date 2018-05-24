@@ -74,9 +74,11 @@ export default class App extends Component {
             placeholder: '输入中文/拼音/首字母',
             onChangeText: text => this.setState({ searchInput: text })
           }}
-          listStyle={styles.list}
-          renderItem={({ item }) => this._renderItem(item)}
-          renderEmptyResult={() => this._renderEmptyResult()}
+          resultListProps={{
+            style: styles.list,
+            renderItem: ({ item }) => this._renderItem(item),
+            ListEmptyComponent: () => this._renderEmptyResult(),
+          }}
         />
       </View>
     );

@@ -20,30 +20,40 @@ export default class Autocomplete extends PureComponent {
     containerStyle: View.propTypes.style,
     inputContainerStyle: View.propTypes.style,
     onShowResults: PropTypes.func,
-    renderItem: PropTypes.func,
-    renderSeparator: PropTypes.func,
     renderTextInput: PropTypes.func,
+    renderResultList: PropTypes.func,
     textInputProps: PropTypes.shape({
       ...TextInput.propTypes,
     }),
-    listStyle: View.propTypes.style,
+    resultListProps: PropTypes.shape({
+      ...FlatList.propTypes,
+    }),
   }; 
 
   static defaultProps = {
     data: [],
-    renderItem: item => (<Text>{item}</Text>),
     renderTextInput: props => (<TextInput {...props} />),
-    renderSeparator: null,
+    renderResultList: props => (<FlatList {...props} />),
     textInputProps: {},
+    resultListProps: {},
   };
 
   constructor(props) {
     super(props);
     this.textInput = null;
+    this.resultList = null;
     this.state = {
       showResults: false,
     };
   }
+
+  getTextInput = () => {
+    return this.textInput;
+  };
+
+  getResultList = () => {
+    return this.resultList;
+  };
 
   blur = () => {
     const { textInput } = this;
@@ -78,7 +88,7 @@ export default class Autocomplete extends PureComponent {
     this.blur();
   };
 
-  renderTextInput() {
+  renderTextInput = () => {
     const { textInputProps, renderTextInput, } = this.props;
     const { onChangeText, style, ...rest } = textInputProps;
     const props = {
@@ -92,22 +102,25 @@ export default class Autocomplete extends PureComponent {
     };
 
     return renderTextInput(props);
-  }
+  };
 
-  renderResultList() {
-    const { data, listStyle, renderItem, renderSeparator, renderEmptyResult } = this.props;
-    return (
-      <FlatList
-        style={[styles.list, listStyle]}
-        data={data}
-        initialNumToRender={10}
-        keyExtractor={this._keyExtractor}
-        renderItem={renderItem}
-        ItemSeparatorComponent={renderSeparator}
-        ListEmptyComponent={renderEmptyResult}
-      />
-    );
-  }
+  renderItem = ({ item }) => (<Text>{item}</Text>);
+
+  renderResultList = () => {
+    const { data, resultListProps, renderResultList, } = this.props;
+    const { style, ...rest } = resultListProps;
+    const props = {
+      ref: ref => (this.resultList = ref),
+      data,
+      style: [styles.list, style],
+      initialNumToRender: 10,
+      keyExtractor: this._keyExtractor,
+      renderItem: this.renderItem,
+      ...rest
+    };
+
+    return renderResultList(props);
+  };
 
   render() {
     const { showResults } = this.state;
