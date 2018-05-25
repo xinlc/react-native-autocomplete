@@ -119,7 +119,6 @@ export default class Autocomplete extends PureComponent {
     const { data } = this.state;
     const { resultListProps, renderResultList, } = this.props;
     const { style, ...rest } = resultListProps;
-    console.log('111', data)
     const props = {
       ref: ref => (this.resultList = ref),
       data,
