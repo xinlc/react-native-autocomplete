@@ -1,6 +1,6 @@
 {
-  "name": "react-native-autocomplete",
-  "version": "0.0.1",
+  "name": "react-native-autocompleter",
+  "version": "0.0.2",
   "description": "autocomplete input for react-native",
   "main": "src/index.js",
   "scripts": {

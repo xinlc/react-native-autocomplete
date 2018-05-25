@@ -16,7 +16,6 @@ import PositionData from './PositionData';
 export default class App extends Component {
   state = {
     data: PositionData.list,
-    searchInput: ''
   };
   Autocomplete = null;
 
@@ -28,8 +27,7 @@ export default class App extends Component {
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: '#F0F1F2',
     };
-    // const textColor = this.state.tags.some(n => data.name == n.name) ? '#F9CB00' : '#333';
-    const textColor = '#F9CB00';
+    const textColor = '#333';
     return (
       <TouchableOpacity
         style={styles}
@@ -49,39 +47,49 @@ export default class App extends Component {
   }
 
   render() {
-    const { searchInput } = this.state
-    let data = [];
-    if (searchInput.trim() != '') {
-      const regex = new RegExp(`^${searchInput.trim()}`, 'i');
-      data = this.state.data.filter((n) => {
-        if (n.name.search(regex) >= 0) {
-          return true;
-        } else if (n.PY.findIndex(n => n.search(regex) >= 0) >= 0) {
-          return true;
-        } else if (n.firstPY.findIndex(n => n.search(regex) >= 0) >= 0) {
-          return true;
-        }
-        return false;
-      });
-    }
     return (
       <View style={styles.container}>
-        <Autocomplete
-          ref={ref => (this.Autocomplete = ref)}
-          data={data}
-          textInputProps={{
-            maxLength: 100,
-            placeholder: '输入中文/拼音/首字母',
-            onChangeText: text => this.setState({ searchInput: text })
-          }}
-          resultListProps={{
-            style: styles.list,
-            renderItem: ({ item }) => this._renderItem(item),
-            ListEmptyComponent: () => this._renderEmptyResult(),
-          }}
-          showCancelButton
-          cancelText="取消"
-        />
+        {/* <View style={{ marginTop: 50, backgroundColor: '#fff'}}>
+          <Text>1233</Text>
+          <Text>1233</Text>
+          <Text>1233</Text>
+          <Text>1233</Text>
+          <Text>1233</Text>
+        </View> */}
+        <View style={styles.autocomplete}>
+          <Autocomplete
+            ref={ref => (this.Autocomplete = ref)}
+            data={this.state.data}
+            lookup={(data, keyword, response) => {
+              let _data = [];
+              if (keyword.trim() != '') {
+                const regex = new RegExp(`^${keyword.trim()}`, 'i');
+                _data = data.filter((n) => {
+                  if (n.name.search(regex) >= 0) {
+                    return true;
+                  } else if (n.PY.findIndex(n => n.search(regex) >= 0) >= 0) {
+                    return true;
+                  } else if (n.firstPY.findIndex(n => n.search(regex) >= 0) >= 0) {
+                    return true;
+                  }
+                  return false;
+                });
+              }
+              response(_data);
+            }}
+            textInputProps={{
+              maxLength: 100,
+              placeholder: '输入中文/拼音/首字母',
+            }}
+            resultListProps={{
+              style: styles.list,
+              renderItem: ({ item }) => this._renderItem(item),
+              ListEmptyComponent: () => this._renderEmptyResult(),
+            }}
+            showCancelButton
+            cancelText="取消"
+          />
+        </View>
       </View>
     );
   }
@@ -96,4 +104,12 @@ const styles = StyleSheet.create({
     padding: 10,
     height: Dimensions.get('window').height - 100,
   },
+  autocomplete: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    zIndex: 2,
+    backgroundColor: '#fff'
+  }
 });

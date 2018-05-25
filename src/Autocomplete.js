@@ -31,12 +31,14 @@ export default class Autocomplete extends PureComponent {
     }),
     showCancelButton: PropTypes.bool,
     cancelText: PropTypes.string,
+    lookup: PropTypes.func,
   }; 
 
   static defaultProps = {
     data: [],
     renderTextInput: props => (<TextInput {...props} />),
     renderResultList: props => (<FlatList {...props} />),
+    lookup: (data, keyword, response) => { response(data.filter((n) => n == keyword))},
     textInputProps: {},
     resultListProps: {},
     showCancelButton: false,
@@ -48,6 +50,7 @@ export default class Autocomplete extends PureComponent {
     this.textInput = null;
     this.resultList = null;
     this.state = {
+      data: props.data.slice(),
       showResults: false,
     };
   }
@@ -80,13 +83,18 @@ export default class Autocomplete extends PureComponent {
 
   _keyExtractor = (item, index) => index.toString();
 
+  _setData = (data = []) => {
+    this.setState({ data });
+  };
+
   _onChangeText = (e, onChangeText) => {
-    if (!this.state.showResults) {
-      this.setState({
-        showResults: true
-      });
-    }
+    const { data, lookup } = this.props;
     onChangeText && onChangeText(e);
+
+    if (!this.state.showResults) {
+      this.setState({ showResults: true });
+    }
+    lookup(data, e, this._setData);
   };
 
   renderTextInput = () => {
@@ -108,8 +116,10 @@ export default class Autocomplete extends PureComponent {
   renderItem = ({ item }) => (<Text>{item}</Text>);
 
   renderResultList = () => {
-    const { data, resultListProps, renderResultList, } = this.props;
+    const { data } = this.state;
+    const { resultListProps, renderResultList, } = this.props;
     const { style, ...rest } = resultListProps;
+    console.log('111', data)
     const props = {
       ref: ref => (this.resultList = ref),
       data,
@@ -159,11 +169,6 @@ export default class Autocomplete extends PureComponent {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 0,
-    zIndex: 1,
   },
   inputStyle: {
     flex: 1,
@@ -187,9 +192,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   list: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
     marginTop: 0,
     borderWidth: 0,
     borderTopWidth: StyleSheet.hairlineWidth,
