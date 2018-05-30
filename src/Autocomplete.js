@@ -11,14 +11,18 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  ViewPropTypes,
 } from 'react-native';
 import PropTypes from 'prop-types';
+
+//Fallback when RN version is < 0.44
+const viewPropTypes = ViewPropTypes || View.propTypes;
 
 export default class Autocomplete extends PureComponent {
   static propTypes = {
     data: PropTypes.array.isRequired,
-    containerStyle: View.propTypes.style,
-    inputContainerStyle: View.propTypes.style,
+    containerStyle: viewPropTypes.style,
+    inputContainerStyle: viewPropTypes.style,
     onShowResults: PropTypes.func,
     renderTextInput: PropTypes.func,
     renderResultList: PropTypes.func,
